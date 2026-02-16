@@ -1,0 +1,21 @@
+node_modules/
+dist/
+build/
+.next/
+coverage/
+.cache/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Local data + secrets
+chroma-data/
+.env
+.env.local
+
+# Editor / OS
+.DS_Store
+*.log
