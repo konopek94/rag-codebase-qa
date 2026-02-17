@@ -34,3 +34,13 @@ export async function queryChunks(
   const data = await res.json();
   return data.chunks;
 }
+
+export async function dropCollection(collection: string): Promise<void> {
+  const res = await fetch(`${BASE_URL}/collections/${encodeURIComponent(collection)}`, {
+    method: "DELETE",
+  });
+  // 204 = deleted, 404 = didn't exist — both treated as success.
+  if (res.status !== 204 && res.status !== 404) {
+    throw new Error(`Python service error: ${res.status}`);
+  }
+}
