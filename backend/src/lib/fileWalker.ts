@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const SKIP_DIRS = new Set(["node_modules", ".git", "dist", "build", ".next", "coverage", ".cache"]);
-const SKIP_EXTENSIONS = new Set([
+const EXCLUDE_DIRS = new Set(["node_modules", ".git", "dist", "build", ".next", "coverage", ".cache"]);
+const EXCLUDE_EXTENSIONS = new Set([
   ".png",
   ".jpg",
   ".jpeg",
@@ -19,12 +19,12 @@ const SKIP_EXTENSIONS = new Set([
   ".gz",
 ]);
 
-export function shouldSkipPath(filePath: string): boolean {
+export function shouldExcludePath(filePath: string): boolean {
   const parts = filePath.split(path.sep);
-  if (parts.some((p) => SKIP_DIRS.has(p))) return true;
+  if (parts.some((p) => EXCLUDE_DIRS.has(p))) return true;
   if (filePath.includes(".min.")) return true;
   const ext = path.extname(filePath);
-  if (SKIP_EXTENSIONS.has(ext)) return true;
+  if (EXCLUDE_EXTENSIONS.has(ext)) return true;
   return false;
 }
 
@@ -35,7 +35,7 @@ export function collectFiles(repoPath: string): string[] {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
-      if (shouldSkipPath(fullPath)) continue;
+      if (shouldExcludePath(fullPath)) continue;
       if (entry.isDirectory()) {
         walk(fullPath);
       } else if (entry.isFile()) {
