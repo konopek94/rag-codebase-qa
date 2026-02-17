@@ -14,7 +14,7 @@ export function getLLM(): LanguageModel {
     case 'google':
       return createGoogleGenerativeAI()(model ?? 'gemini-2.0-flash')
     case 'mistral':
-      return createMistral()(model ?? 'mistral-large-latest')
+      return createMistral()(model ?? 'mistral-medium-3.5');
     case 'anthropic':
     default:
       return createAnthropic()(model ?? 'claude-sonnet-4-6')
