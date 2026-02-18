@@ -1,31 +1,57 @@
 import { Hono } from "hono";
+import fs from "node:fs";
 import path from "node:path";
 import { collectFiles } from "../lib/fileWalker.js";
 import { chunkFile, type Chunk } from "../lib/chunker.js";
-import { ingestChunks } from "../lib/pyClient.js";
+import { ingestChunks, dropCollection } from "../lib/pyClient.js";
+import { buildIgnoreMatcher } from "../lib/ignoreMatcher.js";
 
 export const ingestRouter = new Hono();
 
 ingestRouter.post("/", async (c) => {
-  const { repoPath } = await c.req.json<{ repoPath: string }>();
+  const { repoPath, excludePatterns } = await c.req.json<{
+    repoPath: string;
+    excludePatterns?: string;
+  }>();
 
   if (!repoPath) return c.json({ error: "repoPath is required" }, 400);
 
-  const files = collectFiles(repoPath);
+  const gitignorePath = path.join(repoPath, ".gitignore");
+  const gitignoreContent = fs.existsSync(gitignorePath)
+    ? fs.readFileSync(gitignorePath, "utf-8")
+    : "";
+  const matcher = buildIgnoreMatcher(gitignoreContent, excludePatterns ?? "");
+
+  const { included, excluded } = collectFiles(repoPath, matcher);
+
+  const relExcluded = excluded.map((f) => path.relative(repoPath, f));
+
   const allChunks: Chunk[] = [];
   const skipped: string[] = [];
-  for (const file of files) {
-    const chunks = chunkFile(file, repoPath);
-    if (chunks.length === 0) {
-      skipped.push(file.replace(repoPath + path.sep, ""));
-    } else {
-      allChunks.push(...chunks);
+  for (const file of included) {
+    try {
+      const chunks = chunkFile(file, repoPath);
+      if (chunks.length === 0) {
+        skipped.push(path.relative(repoPath, file));
+      } else {
+        allChunks.push(...chunks);
+      }
+    } catch (err) {
+      console.warn(`Failed to chunk ${file}:`, err);
+      skipped.push(path.relative(repoPath, file));
     }
+  }
+
+  const collection = path.basename(repoPath);
+
+  try {
+    await dropCollection(collection);
+  } catch {
+    return c.json({ error: "Embedding service unavailable", stage: "drop" }, 503);
   }
 
   const batchSize = 32;
   let totalIndexed = 0;
-  const collection = path.basename(repoPath);
 
   try {
     for (let i = 0; i < allChunks.length; i += batchSize) {
@@ -34,8 +60,12 @@ ingestRouter.post("/", async (c) => {
       totalIndexed += result.indexed;
     }
   } catch {
-    return c.json({ error: "Embedding service unavailable" }, 503);
+    return c.json({ error: "Embedding service unavailable", stage: "embed" }, 503);
   }
 
-  return c.json({ chunksIndexed: totalIndexed, filesSkipped: skipped });
+  return c.json({
+    chunksIndexed: totalIndexed,
+    filesExcluded: relExcluded,
+    filesSkipped: skipped,
+  });
 });
