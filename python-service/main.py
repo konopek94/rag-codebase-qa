@@ -40,3 +40,11 @@ def query(req: QueryRequest):
             "metadata": results["metadatas"][0][i],
         })
     return {"chunks": chunks}
+
+@app.delete("/collections/{name}", status_code=204)
+def delete_collection(name: str):
+    try:
+        chroma_client.delete_collection(name)
+    except Exception:
+        raise HTTPException(status_code=404, detail="Collection not found")
+    return None
