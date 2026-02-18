@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import type { Ignore } from "ignore";
 
 const EXCLUDE_DIRS = new Set(["node_modules", ".git", "dist", "build", ".next", "coverage", ".cache"]);
 const EXCLUDE_EXTENSIONS = new Set([
@@ -28,22 +29,38 @@ export function shouldExcludePath(filePath: string): boolean {
   return false;
 }
 
-export function collectFiles(repoPath: string): string[] {
-  const files: string[] = [];
+export type WalkResult = {
+  included: string[];
+  excluded: string[];
+};
+
+export function collectFiles(repoPath: string, ignoreMatcher?: Ignore): WalkResult {
+  const included: string[] = [];
+  const excluded: string[] = [];
 
   function walk(dir: string) {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
-      if (shouldExcludePath(fullPath)) continue;
+      const relPath = path.relative(repoPath, fullPath);
+
+      if (shouldExcludePath(fullPath)) {
+        excluded.push(fullPath);
+        continue;
+      }
+      if (ignoreMatcher && relPath.length > 0 && ignoreMatcher.ignores(relPath)) {
+        excluded.push(fullPath);
+        continue;
+      }
+
       if (entry.isDirectory()) {
         walk(fullPath);
       } else if (entry.isFile()) {
-        files.push(fullPath);
+        included.push(fullPath);
       }
     }
   }
 
   walk(repoPath);
-  return files;
+  return { included, excluded };
 }
