@@ -115,6 +115,7 @@ Supported LLM providers:
 - **Smart skip list**: ignores node_modules, dist, build, .git, minified files, binary assets
 - **SSE streaming**: token-by-token answer delivery with `event: sources` metadata
 - **CORS enabled**: frontend and backend can be on different origins
+- **Path filtering**: honors `.gitignore` in the indexed repo, plus an optional "Extra excludes" textarea for ad-hoc per-ingest patterns
 
 ## Development
 
@@ -142,9 +143,12 @@ curl -X POST http://localhost:8001/query \
 # → {"chunks":[...]}
 ```
 
+## Known Issues
+
+- **Collection-name collisions.** Each indexed repo becomes a Chroma collection named after its directory basename (e.g. `/work/proj` and `/play/proj` would collide). Re-indexing now *replaces* a collection rather than merging, so indexing the second `proj` will delete the first one's chunks. Workaround: rename one of the directories before indexing. A proper fix is tracked as follow-up work.
+
 ## Future Work
 
-- [ ] Index filtering (exclude certain paths)
 - [ ] Conversation history (ask follow-ups without re-indexing)
 - [ ] Batch indexing (multiple repos)
 - [ ] Export mode (save Q&A transcript)
