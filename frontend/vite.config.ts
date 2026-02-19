@@ -7,6 +7,7 @@ export default defineConfig({
     proxy: {
       '/ingest': 'http://localhost:3001',
       '/query': 'http://localhost:3001',
+      '/history': 'http://localhost:3001',
     }
   }
 })
