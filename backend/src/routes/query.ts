@@ -4,13 +4,22 @@ import { streamSSE } from "hono/streaming";
 import path from "node:path";
 import { queryChunks } from "../lib/pyClient.js";
 import { getLLM } from "../lib/llm.js";
+import { readHistory, appendTurn } from "../lib/historyStore.js";
 
 export const queryRouter = new Hono();
 
+const DEFAULT_HISTORY_LIMIT = 10;
+
 queryRouter.post("/", async (c) => {
-  const { question, repoPath } = await c.req.json<{ question: string; repoPath: string }>();
+  const { question, repoPath, historyLimit } = await c.req.json<{
+    question: string;
+    repoPath: string;
+    historyLimit?: number;
+  }>();
 
   if (!question || !repoPath) return c.json({ error: "question and repoPath are required" }, 400);
+
+  const limit = historyLimit ?? DEFAULT_HISTORY_LIMIT;
 
   const collection = path.basename(repoPath);
   const chunks = await queryChunks(collection, question);
@@ -27,23 +36,36 @@ queryRouter.post("/", async (c) => {
 When referencing code, cite the source using the format [file:line] that appears before each snippet.
 If the answer isn't in the context, say so — do not guess.`;
 
+  const priorTurns = readHistory(repoPath).slice(-limit);
+  const sources = chunks.map((ch) => ({
+    file: ch.metadata.file,
+    startLine: ch.metadata.startLine,
+    endLine: ch.metadata.endLine,
+  }));
+
   return streamSSE(c, async (stream) => {
     const result = streamText({
       model: getLLM(),
       system: systemPrompt,
-      messages: [{ role: "user", content: `Context:\n${context}\n\nQuestion: ${question}` }],
+      messages: [
+        ...priorTurns.flatMap((turn) => [
+          { role: "user" as const, content: turn.question },
+          { role: "assistant" as const, content: turn.answer },
+        ]),
+        { role: "user" as const, content: `Context:\n${context}\n\nQuestion: ${question}` },
+      ],
     });
 
+    let answer = "";
     for await (const chunk of result.textStream) {
+      answer += chunk;
       await stream.writeSSE({ data: chunk });
     }
 
-    // Send citations after stream completes
-    const sources = chunks.map((ch) => ({
-      file: ch.metadata.file,
-      startLine: ch.metadata.startLine,
-      endLine: ch.metadata.endLine,
-    }));
+    // Send citations after the text stream completes.
     await stream.writeSSE({ data: JSON.stringify({ sources }), event: "sources" });
+
+    // Persist the completed turn so the next question can see it.
+    appendTurn(repoPath, { question, answer, sources });
   });
 });
