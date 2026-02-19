@@ -147,9 +147,24 @@ curl -X POST http://localhost:8001/query \
 
 - **Collection-name collisions.** Each indexed repo becomes a Chroma collection named after its directory basename (e.g. `/work/proj` and `/play/proj` would collide). Re-indexing now *replaces* a collection rather than merging, so indexing the second `proj` will delete the first one's chunks. Workaround: rename one of the directories before indexing. A proper fix is tracked as follow-up work.
 
+## Conversation History
+
+Multi-turn Q&A — ask follow-ups without re-indexing. History is persisted per repo at `~/.rag-qa/history/<collection>.json` and survives page reloads.
+
+**Frontend:**
+- Scrollable turn list (question bubbles, answer blocks with collapsible sources)
+- User-settable history depth (how many prior turns to send to the LLM; default 10)
+- Clear button to reset conversation
+
+**Backend:**
+- `GET /history?repoPath=<path>` — fetch conversation history
+- `DELETE /history?repoPath=<path>` — clear history
+- `POST /query` now accepts optional `historyLimit` field
+
+Example: ask "what does the auth system do?", then follow up with "where is it defined?" — the LLM sees both turns and can answer with context.
+
 ## Future Work
 
-- [ ] Conversation history (ask follow-ups without re-indexing)
 - [ ] Batch indexing (multiple repos)
 - [ ] Export mode (save Q&A transcript)
 - [ ] Web deployment (e.g., Vercel + Supabase vector)
