@@ -2,6 +2,16 @@ import { useState } from 'react'
 import { useConversation } from '../hooks/useConversation'
 import { SourceCitation } from './SourceCitation'
 
+function formatAnswer(text: string) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g)
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i}>{part.slice(2, -2)}</strong>
+    }
+    return <span key={i}>{part}</span>
+  })
+}
+
 export function ChatInterface({ repoPath }: { repoPath: string }) {
   const [question, setQuestion] = useState('')
   const { turns, loading, ask, clearHistory, historyLimit, setHistoryLimit } =
@@ -31,9 +41,9 @@ export function ChatInterface({ repoPath }: { repoPath: string }) {
               </div>
             </div>
             <div>
-              <pre className="whitespace-pre-wrap text-sm bg-gray-50 p-3 rounded">
-                {turn.answer}
-              </pre>
+              <div className="whitespace-pre-wrap text-sm bg-gray-50 p-3 rounded">
+                {formatAnswer(turn.answer)}
+              </div>
               <SourceCitation sources={turn.sources} />
             </div>
           </div>
