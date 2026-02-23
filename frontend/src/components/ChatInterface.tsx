@@ -3,14 +3,19 @@ import { useConversation } from '../hooks/useConversation'
 import { SourceCitation } from './SourceCitation'
 
 function formatAnswer(text: string) {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g)
+  // First, clean up markdown syntax
+  let cleaned = text
+    .replace(/^#+\s+/gm, '') // Remove heading syntax (###, ##, #)
+    .replace(/^---+$/gm, '') // Remove horizontal rules (---)
+    .replace(/\n\n+/g, '\n') // Collapse multiple blank lines
+
+  // Then split by bold markers and render
+  const parts = cleaned.split(/(\*\*[^*]+\*\*)/g)
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
       return <strong key={i}>{part.slice(2, -2)}</strong>
     }
-    // Remove leading markdown heading syntax (###, ##, #) from lines
-    const cleaned = part.replace(/^#+\s+/gm, '')
-    return <span key={i}>{cleaned}</span>
+    return <span key={i}>{part}</span>
   })
 }
 
