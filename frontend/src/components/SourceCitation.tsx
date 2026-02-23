@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Source } from '../hooks/useQuery'
+import type { Source } from '../hooks/useConversation'
 
 export function SourceCitation({ sources }: { sources: Source[] }) {
   const [open, setOpen] = useState(false)
