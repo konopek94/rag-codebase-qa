@@ -1,7 +1,13 @@
 import { useState } from 'react'
 import { useIngest } from '../hooks/useIngest'
 
-export function RepoIndexer({ onIndexed }: { onIndexed: (path: string) => void }) {
+export function RepoIndexer({
+  onIndexed,
+  onSetRepo
+}: {
+  onIndexed: (path: string) => void
+  onSetRepo: (path: string) => void
+}) {
   const [repoPath, setRepoPath] = useState('')
   const [excludePatterns, setExcludePatterns] = useState('')
   const { ingest, status, result } = useIngest()
@@ -10,6 +16,7 @@ export function RepoIndexer({ onIndexed }: { onIndexed: (path: string) => void }
     e.preventDefault()
     await ingest(repoPath, excludePatterns)
     onIndexed(repoPath)
+    onSetRepo(repoPath)
   }
 
   return (
