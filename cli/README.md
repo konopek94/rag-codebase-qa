@@ -16,6 +16,9 @@ npm run dev
 Make sure the backend is running on `http://localhost:3001` (default).
 
 ```bash
+# List all indexed repositories
+rag-qa list
+
 # Index a repository
 rag-qa index /path/to/your/repo
 
@@ -33,6 +36,16 @@ rag-qa clear /path/to/your/repo
 ```
 
 ## Commands
+
+### `list`
+
+List all indexed repositories (based on conversation history files).
+
+```bash
+rag-qa list
+```
+
+Shows repos with a count of indexed conversations.
 
 ### `index <repoPath>`
 

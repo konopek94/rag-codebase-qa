@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { ingestRepo, askQuestion, getHistory, clearHistory } from './api.js';
+import { ingestRepo, askQuestion, getHistory, clearHistory, listIndexedRepos } from './api.js';
 import { generateTranscript, saveTranscript, ExportFormat } from './export.js';
 import fs from 'fs';
 
@@ -24,6 +24,26 @@ program
       if (result.filesSkipped.length > 0) {
         console.log(chalk.gray(`  ${result.filesSkipped.length} files skipped`));
       }
+    } catch (err) {
+      console.error(chalk.red(`✗ Error: ${err instanceof Error ? err.message : String(err)}`));
+      process.exit(1);
+    }
+  });
+
+program
+  .command('list')
+  .description('List all indexed repositories')
+  .action(async () => {
+    try {
+      const repos = await listIndexedRepos();
+      if (repos.length === 0) {
+        console.log(chalk.gray('No indexed repositories found'));
+        return;
+      }
+      console.log(chalk.blue(`${repos.length} indexed repositor${repos.length === 1 ? 'y' : 'ies'}:\n`));
+      repos.forEach((repo, i) => {
+        console.log(chalk.cyan(`  ${i + 1}. ${repo}`));
+      });
     } catch (err) {
       console.error(chalk.red(`✗ Error: ${err instanceof Error ? err.message : String(err)}`));
       process.exit(1);

@@ -108,3 +108,14 @@ export async function clearHistory(repoPath: string): Promise<void> {
     throw new Error(error.error || 'Failed to clear history');
   }
 }
+
+export async function listIndexedRepos(): Promise<string[]> {
+  const historyDir = `${process.env.HOME}/.rag-qa/history`;
+  try {
+    const fs = await import('fs');
+    const files = fs.readdirSync(historyDir).filter(f => f.endsWith('.json'));
+    return files.map(f => f.replace('.json', ''));
+  } catch {
+    return [];
+  }
+}
