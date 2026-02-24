@@ -35,6 +35,7 @@ A local-first developer tool that answers natural language questions about any c
 ```
 
 **Separation of concerns:**
+
 - Python: stateful ML (embeddings + vector store)
 - Node.js: stateless orchestration (file walking, context building, streaming)
 - React: interactive UI (real-time streaming feedback)
@@ -74,6 +75,7 @@ cp .env.example .env
 ```
 
 Edit `.env`:
+
 ```
 LLM_PROVIDER=mistral
 MISTRAL_API_KEY=<your-mistral-key>
@@ -81,6 +83,7 @@ PYTHON_SERVICE_URL=http://localhost:8001
 ```
 
 Supported LLM providers:
+
 - `anthropic` - Claude Sonnet 4.6 (default)
 - `mistral` - Mistral Large
 - `google` - Gemini 2.0 Flash
@@ -145,29 +148,33 @@ curl -X POST http://localhost:8001/query \
 
 ## Known Issues
 
-- **Collection-name collisions.** Each indexed repo becomes a Chroma collection named after its directory basename (e.g. `/work/proj` and `/play/proj` would collide). Re-indexing now *replaces* a collection rather than merging, so indexing the second `proj` will delete the first one's chunks. Workaround: rename one of the directories before indexing. A proper fix is tracked as follow-up work.
+- **Collection-name collisions.** Each indexed repo becomes a Chroma collection named after its directory basename (e.g. `/work/proj` and `/play/proj` would collide). Re-indexing now _replaces_ a collection rather than merging, so indexing the second `proj` will delete the first one's chunks. Workaround: rename one of the directories before indexing. A proper fix is tracked as follow-up work.
 
 ## Conversation History & Repo History
 
 **Multi-turn Q&A** — ask follow-ups without re-indexing. History is persisted per repo at `~/.rag-qa/history/<collection>.json` and survives page reloads.
 
 **Conversation history (Frontend):**
+
 - Scrollable turn list (question bubbles, answer blocks with collapsible sources)
 - User-settable history depth (how many prior turns to send to the LLM; default 10)
 - Clear button to reset conversation
 - Markdown formatting: bold text (`**...**`) and heading cleanup
 
 **Conversation history (Backend):**
+
 - `GET /history?repoPath=<path>` — fetch conversation history
 - `DELETE /history?repoPath=<path>` — clear history
 - `POST /query` now accepts optional `historyLimit` field
 
 **Repository history (Frontend):**
+
 - Recent repos list (up to 10) with localStorage persistence
 - Click any repo to load its chat without re-indexing
 - Remove button (✕) to clean up history
 
 **Export transcripts:**
+
 - Download conversations in markdown, JSON, or CSV format
 - Includes repo path, all turns, questions, answers, and sources
 - Timestamped filenames for easy organization
@@ -178,9 +185,16 @@ Example workflow: Index `/Users/you/project-a`, ask "what does auth do?", follow
 
 Query your codebase from the terminal without a browser. See [cli/README.md](./cli/README.md) for full documentation.
 
+**Installation (local development):**
 ```bash
-npm install -g @rag-qa/cli
+cd cli
+npm install
+npm run build
+npm run dev  # or: npm install -g . to install globally from repo
+```
 
+**Usage:**
+```bash
 rag-qa index /path/to/repo
 rag-qa ask "how does auth work?" --repo /path/to/repo
 rag-qa history /path/to/repo
