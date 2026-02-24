@@ -167,11 +167,15 @@ curl -X POST http://localhost:8001/query \
 - Click any repo to load its chat without re-indexing
 - Remove button (✕) to clean up history
 
-Example workflow: Index `/Users/you/project-a`, ask "what does auth do?", follow up with "where is it defined?" — the LLM sees both turns. Later, click `/Users/you/project-a` in the history list to resume the conversation.
+**Export transcripts:**
+- Download conversations in markdown, JSON, or CSV format
+- Includes repo path, all turns, questions, answers, and sources
+- Timestamped filenames for easy organization
+
+Example workflow: Index `/Users/you/project-a`, ask "what does auth do?", follow up with "where is it defined?" — the LLM sees both turns. Later, click `/Users/you/project-a` in the history list to resume the conversation. Export the transcript with the "Export" button.
 
 ## Future Work
 
 - [ ] Batch indexing (index multiple repos at once; workaround: use repo history to switch between repos)
-- [ ] Export mode (save Q&A transcript)
 - [ ] Web deployment (e.g., Vercel + Supabase vector)
 - [ ] CLI interface (`rag-qa query "what is this?"`)
