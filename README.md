@@ -176,6 +176,6 @@ Example workflow: Index `/Users/you/project-a`, ask "what does auth do?", follow
 
 ## Future Work
 
-- [ ] Batch indexing (index multiple repos at once; workaround: use repo history to switch between repos)
-- [ ] Web deployment (e.g., Vercel + Supabase vector)
-- [ ] CLI interface (`rag-qa query "what is this?"`)
+- [ ] **Batch indexing** — Index multiple repos in one operation. Workaround: use repo history to quickly switch between repos without re-indexing.
+- [ ] **Web deployment** — Host on Vercel + Supabase (pgvector). Requires: cloud vector DB, file upload/GitHub integration, user authentication, secure secrets management.
+- [ ] **CLI interface** — Query from terminal without browser. Commands: `rag-qa index <path>`, `rag-qa ask "question"`, `rag-qa export <path>`, etc.
