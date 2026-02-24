@@ -174,8 +174,20 @@ curl -X POST http://localhost:8001/query \
 
 Example workflow: Index `/Users/you/project-a`, ask "what does auth do?", follow up with "where is it defined?" — the LLM sees both turns. Later, click `/Users/you/project-a` in the history list to resume the conversation. Export the transcript with the "Export" button.
 
+## CLI Interface
+
+Query your codebase from the terminal without a browser. See [cli/README.md](./cli/README.md) for full documentation.
+
+```bash
+npm install -g @rag-qa/cli
+
+rag-qa index /path/to/repo
+rag-qa ask "how does auth work?" --repo /path/to/repo
+rag-qa history /path/to/repo
+rag-qa export /path/to/repo --format markdown
+```
+
 ## Future Work
 
 - [ ] **Batch indexing** — Index multiple repos in one operation. Workaround: use repo history to quickly switch between repos without re-indexing.
 - [ ] **Web deployment** — Host on Vercel + Supabase (pgvector). Requires: cloud vector DB, file upload/GitHub integration, user authentication, secure secrets management.
-- [ ] **CLI interface** — Query from terminal without browser. Commands: `rag-qa index <path>`, `rag-qa ask "question"`, `rag-qa export <path>`, etc.
