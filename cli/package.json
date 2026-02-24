@@ -1,0 +1,28 @@
+{
+  "name": "@rag-qa/cli",
+  "version": "1.0.0",
+  "description": "CLI for RAG Codebase Q&A",
+  "type": "module",
+  "bin": {
+    "rag-qa": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "test": "vitest"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "commander": "^12.0.0",
+    "chalk": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "tsx": "^4.7.0",
+    "vitest": "^1.0.0"
+  }
+}
