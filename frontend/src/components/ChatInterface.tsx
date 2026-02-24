@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useConversation } from '../hooks/useConversation'
 import { SourceCitation } from './SourceCitation'
+import { ExportButton } from './ExportButton'
 
 function formatAnswer(text: string) {
   // First, clean up markdown syntax
@@ -69,13 +70,16 @@ export function ChatInterface({ repoPath }: { repoPath: string }) {
             className="w-16 border rounded px-2 py-1"
           />
         </label>
-        <button
-          onClick={clearHistory}
-          className="text-xs text-red-600 underline disabled:opacity-50"
-          disabled={turns.length === 0}
-        >
-          Clear
-        </button>
+        <div className="flex gap-4">
+          <ExportButton turns={turns} repoPath={repoPath} />
+          <button
+            onClick={clearHistory}
+            className="text-xs text-red-600 underline disabled:opacity-50"
+            disabled={turns.length === 0}
+          >
+            Clear
+          </button>
+        </div>
       </div>
 
       <form onSubmit={handleAsk} className="flex gap-2">
