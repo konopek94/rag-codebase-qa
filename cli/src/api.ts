@@ -24,6 +24,16 @@ export async function ingestRepo(
   return (await response.json()) as any;
 }
 
+function formatAnswerText(text: string): string {
+  // Remove markdown heading syntax
+  let cleaned = text
+    .replace(/^#+\s+/gm, '') // Remove heading syntax (###, ##, #)
+    .replace(/^---+$/gm, '') // Remove horizontal rules (---)
+    .replace(/\n\n+/g, '\n'); // Collapse multiple blank lines
+
+  return cleaned;
+}
+
 export async function askQuestion(
   question: string,
   repoPath: string,
@@ -45,6 +55,7 @@ export async function askQuestion(
 
   const decoder = new TextDecoder();
   let sources: any[] = [];
+  let answer = '';
 
   try {
     while (true) {
@@ -63,9 +74,11 @@ export async function askQuestion(
             if (parsed.sources) {
               sources = parsed.sources;
             } else {
+              answer += data;
               process.stdout.write(data);
             }
           } catch {
+            answer += data;
             process.stdout.write(data);
           }
         }
@@ -77,7 +90,8 @@ export async function askQuestion(
 
   // Print sources at the end
   if (sources.length > 0) {
-    console.log('\n\nSources:');
+    console.log('\n');
+    console.log('Sources:');
     sources.forEach(src => {
       console.log(`  ${src.file}:${src.startLine}-${src.endLine}`);
     });

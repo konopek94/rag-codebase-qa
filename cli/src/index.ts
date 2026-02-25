@@ -113,10 +113,10 @@ program
       if (isNaN(historyDepth) || historyDepth < 0) {
         throw new Error('--history must be a non-negative number');
       }
-      console.log(chalk.blue(`Q: ${question}\n`));
-      console.log(chalk.dim('A: '));
+      console.log(chalk.blue(`Q: ${question}`));
+      console.log(chalk.dim('\nA:'));
       await askQuestion(question, repoPath, historyDepth);
-      console.log('\n');
+      console.log();
     } catch (err) {
       console.error(chalk.red(`\n✗ Error: ${err instanceof Error ? err.message : String(err)}`));
       process.exit(1);
