@@ -185,20 +185,32 @@ Example workflow: Index `/Users/you/project-a`, ask "what does auth do?", follow
 
 Query your codebase from the terminal without a browser. See [cli/README.md](./cli/README.md) for full documentation.
 
-**Installation (local development):**
+**Installation:**
+
+For local development:
 ```bash
 cd cli
 npm install
 npm run build
-npm run dev  # or: npm install -g . to install globally from repo
+npm run dev -- <command>  # e.g., npm run dev -- list
+```
+
+Or install globally:
+```bash
+cd cli
+npm install
+npm run build
+npm install -g .  # Install from repo
 ```
 
 **Usage:**
 ```bash
-rag-qa index /path/to/repo
-rag-qa ask "how does auth work?" --repo /path/to/repo
-rag-qa history /path/to/repo
-rag-qa export /path/to/repo --format markdown
+rag-qa list                                              # Show indexed repos
+rag-qa index /path/to/repo                              # Index a repo
+rag-qa ask "how does auth work?" --repo /path/to/repo   # Ask a question
+rag-qa history /path/to/repo                            # View conversation
+rag-qa export /path/to/repo --format markdown           # Export transcript
+rag-qa clear /path/to/repo                              # Clear history
 ```
 
 ## Future Work
