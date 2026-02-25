@@ -27,9 +27,10 @@ export async function ingestRepo(
 function formatAnswerText(text: string): string {
   // Remove markdown heading syntax
   let cleaned = text
-    .replace(/^#+\s+/gm, '') // Remove heading syntax (###, ##, #)
-    .replace(/^---+$/gm, '') // Remove horizontal rules (---)
-    .replace(/\n\n+/g, '\n'); // Collapse multiple blank lines
+    .replace(/#{1,6}\s+/g, '')  // Remove heading syntax (###, ##, #)
+    .replace(/\*\*/g, '')        // Remove bold markers
+    .replace(/^---+$/gm, '')    // Remove horizontal rules (---)
+    .replace(/\n\n+/g, '\n');   // Collapse multiple blank lines
 
   return cleaned;
 }
@@ -75,14 +76,11 @@ export async function askQuestion(
               sources = parsed.sources;
             } else {
               answer += data;
-              // Format the answer text before output
-              const formatted = formatAnswerText(data);
-              process.stdout.write(formatted);
+              process.stdout.write(formatAnswerText(data));
             }
           } catch {
             answer += data;
-            const formatted = formatAnswerText(data);
-            process.stdout.write(formatted);
+            process.stdout.write(formatAnswerText(data));
           }
         }
       }
@@ -90,6 +88,8 @@ export async function askQuestion(
   } finally {
     reader.cancel();
   }
+
+  process.stdout.write('\n');
 
   // Print sources at the end
   if (sources.length > 0) {

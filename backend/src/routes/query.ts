@@ -34,7 +34,8 @@ queryRouter.post("/", async (c) => {
 
   const systemPrompt = `You are a codebase assistant. Answer questions using only the provided code context.
 When referencing code, cite the source using the format [file:line] that appears before each snippet.
-If the answer isn't in the context, say so — do not guess.`;
+If the answer isn't in the context, say so — do not guess.
+Format responses as plain text. Do not use markdown headings (###, ##, #), horizontal rules (---), or bold/italic markers (**, *, __).`;
 
   const priorTurns = readHistory(repoPath).slice(-limit);
   const sources = chunks.map((ch) => ({
