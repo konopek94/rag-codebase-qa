@@ -75,11 +75,14 @@ export async function askQuestion(
               sources = parsed.sources;
             } else {
               answer += data;
-              process.stdout.write(data);
+              // Format the answer text before output
+              const formatted = formatAnswerText(data);
+              process.stdout.write(formatted);
             }
           } catch {
             answer += data;
-            process.stdout.write(data);
+            const formatted = formatAnswerText(data);
+            process.stdout.write(formatted);
           }
         }
       }
