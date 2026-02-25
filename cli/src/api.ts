@@ -120,6 +120,27 @@ export async function listIndexedRepos(): Promise<string[]> {
   }
 }
 
+export async function resolveRepoPath(repoIdentifier: string): Promise<string> {
+  // Check if it's a number (index)
+  const index = parseInt(repoIdentifier, 10);
+  if (!isNaN(index) && index > 0) {
+    const repos = await listIndexedRepos();
+    if (index <= repos.length) {
+      return repos[index - 1]; // Convert 1-based to 0-based
+    }
+    throw new Error(`Repository index ${index} not found (only ${repos.length} repos indexed)`);
+  }
+
+  // Check if it's a repo name (basename)
+  const repos = await listIndexedRepos();
+  if (repos.includes(repoIdentifier)) {
+    return repoIdentifier;
+  }
+
+  // Treat as a full path
+  return repoIdentifier;
+}
+
 export async function getDefaultRepo(): Promise<string | null> {
   try {
     const fs = await import('fs');

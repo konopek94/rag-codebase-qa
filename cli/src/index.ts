@@ -10,6 +10,7 @@ import {
   getDefaultRepo,
   setDefaultRepo,
   clearDefaultRepo,
+  resolveRepoPath,
 } from './api.js';
 import { generateTranscript, saveTranscript, ExportFormat } from './export.js';
 import fs from 'fs';
@@ -86,23 +87,26 @@ program
   });
 
 program
-  .command('ask <question>')
+  .command('ask <question> [repoIdentifier]')
   .description('Ask a question about the indexed repo')
-  .option('--repo <path>', 'Path to the indexed repository (uses default if not specified)')
+  .option('--repo <path>', 'Path/name/index of the repository (uses default if not specified)')
   .option('--history <depth>', 'How many prior turns to include (default: 10)', '10')
-  .action(async (question, options) => {
+  .action(async (question, repoIdentifier, options) => {
     try {
-      let repoPath = options.repo;
+      let repoPath = options.repo || repoIdentifier;
 
       // Use default repo if not specified
       if (!repoPath) {
         repoPath = await getDefaultRepo();
         if (!repoPath) {
           throw new Error(
-            'No repo specified. Use --repo <path> or set default with "rag-qa set-default <path>"'
+            'No repo specified. Use: rag-qa ask "question" <repo>, rag-qa ask "question" --repo <repo>, or rag-qa set-default'
           );
         }
         console.log(chalk.gray(`Using default repo: ${repoPath}\n`));
+      } else {
+        // Resolve the repo identifier (could be index, name, or path)
+        repoPath = await resolveRepoPath(repoPath);
       }
 
       const historyDepth = parseInt(options.history, 10);
@@ -120,10 +124,11 @@ program
   });
 
 program
-  .command('history <repoPath>')
+  .command('history <repoIdentifier>')
   .description('Show conversation history for a repo')
-  .action(async (repoPath) => {
+  .action(async (repoIdentifier) => {
     try {
+      const repoPath = await resolveRepoPath(repoIdentifier);
       const turns = await getHistory(repoPath);
       if (turns.length === 0) {
         console.log(chalk.gray('No conversation history'));
@@ -146,12 +151,13 @@ program
   });
 
 program
-  .command('export <repoPath>')
+  .command('export <repoIdentifier>')
   .description('Export conversation history as a file')
   .option('--format <type>', 'Export format: markdown, json, csv (default: markdown)', 'markdown')
   .option('--output <dir>', 'Output directory (default: current directory)')
-  .action(async (repoPath, options) => {
+  .action(async (repoIdentifier, options) => {
     try {
+      const repoPath = await resolveRepoPath(repoIdentifier);
       const format = options.format as ExportFormat;
       if (!['markdown', 'json', 'csv'].includes(format)) {
         throw new Error('--format must be markdown, json, or csv');
@@ -174,10 +180,11 @@ program
   });
 
 program
-  .command('clear <repoPath>')
+  .command('clear <repoIdentifier>')
   .description('Clear conversation history for a repo')
-  .action(async (repoPath) => {
+  .action(async (repoIdentifier) => {
     try {
+      const repoPath = await resolveRepoPath(repoIdentifier);
       await clearHistory(repoPath);
       console.log(chalk.green('✓ Conversation history cleared'));
     } catch (err) {
