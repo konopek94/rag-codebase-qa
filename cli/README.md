@@ -22,8 +22,12 @@ rag-qa list
 # Index a repository
 rag-qa index /path/to/your/repo
 
-# Ask a question
-rag-qa ask "how does auth work?" --repo /path/to/your/repo
+# Set default repo (optional, for faster queries)
+rag-qa set-default /path/to/your/repo
+
+# Ask a question (uses default repo if set, or --repo flag)
+rag-qa ask "how does auth work?"
+rag-qa ask "where is it?" --repo /path/to/repo  # Override default
 
 # View conversation history
 rag-qa history /path/to/your/repo
@@ -33,6 +37,9 @@ rag-qa export /path/to/your/repo --format markdown
 
 # Clear history
 rag-qa clear /path/to/your/repo
+
+# Clear default repo setting
+rag-qa clear-default
 ```
 
 ## Commands
@@ -46,6 +53,28 @@ rag-qa list
 ```
 
 Shows repos with a count of indexed conversations.
+
+### `set-default <repoPath>`
+
+Set a default repository for `ask` queries. This saves the path to `~/.rag-qa/config.json`.
+
+```bash
+rag-qa set-default /path/to/repo
+```
+
+After setting a default, you can use `rag-qa ask` without the `--repo` flag:
+```bash
+rag-qa ask "how does auth work?"  # Uses default repo
+rag-qa ask "where?" --repo /other/repo  # Override default
+```
+
+### `clear-default`
+
+Clear the default repository setting.
+
+```bash
+rag-qa clear-default
+```
 
 ### `index <repoPath>`
 
@@ -64,12 +93,13 @@ rag-qa index /path/to/repo --exclude "docs/**\n*.snap"
 Ask a question about an indexed repository.
 
 ```bash
-rag-qa ask "what does the auth system do?" --repo /path/to/repo
-rag-qa ask "where is it defined?" --repo /path/to/repo --history 5
+rag-qa ask "what does the auth system do?"  # Uses default repo
+rag-qa ask "what does the auth system do?" --repo /path/to/repo  # Explicit repo
+rag-qa ask "where is it defined?" --history 5
 ```
 
 **Options:**
-- `--repo <path>` — **Required.** Path to the indexed repository
+- `--repo <path>` — Path to the indexed repository. If not specified, uses the default repo set with `set-default`. Required if no default is set.
 - `--history <depth>` — How many prior turns to include (default: 10)
 
 ### `history <repoPath>`

@@ -119,3 +119,50 @@ export async function listIndexedRepos(): Promise<string[]> {
     return [];
   }
 }
+
+export async function getDefaultRepo(): Promise<string | null> {
+  try {
+    const fs = await import('fs');
+    const configPath = `${process.env.HOME}/.rag-qa/config.json`;
+    if (!fs.existsSync(configPath)) return null;
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8')) as any;
+    return config.defaultRepo || null;
+  } catch {
+    return null;
+  }
+}
+
+export async function setDefaultRepo(repoPath: string): Promise<void> {
+  try {
+    const fs = await import('fs');
+    const path = await import('path');
+    const configDir = `${process.env.HOME}/.rag-qa`;
+    const configPath = `${configDir}/config.json`;
+
+    fs.mkdirSync(configDir, { recursive: true });
+
+    let config: any = {};
+    if (fs.existsSync(configPath)) {
+      config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    }
+
+    config.defaultRepo = repoPath;
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
+  } catch (err) {
+    throw new Error(`Failed to set default repo: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
+export async function clearDefaultRepo(): Promise<void> {
+  try {
+    const fs = await import('fs');
+    const configPath = `${process.env.HOME}/.rag-qa/config.json`;
+    if (fs.existsSync(configPath)) {
+      let config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+      delete config.defaultRepo;
+      fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
+    }
+  } catch (err) {
+    throw new Error(`Failed to clear default repo: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}

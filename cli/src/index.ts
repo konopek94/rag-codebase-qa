@@ -1,7 +1,16 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { ingestRepo, askQuestion, getHistory, clearHistory, listIndexedRepos } from './api.js';
+import {
+  ingestRepo,
+  askQuestion,
+  getHistory,
+  clearHistory,
+  listIndexedRepos,
+  getDefaultRepo,
+  setDefaultRepo,
+  clearDefaultRepo,
+} from './api.js';
 import { generateTranscript, saveTranscript, ExportFormat } from './export.js';
 import fs from 'fs';
 
@@ -51,19 +60,58 @@ program
   });
 
 program
+  .command('set-default <repoPath>')
+  .description('Set the default repository for queries')
+  .action(async (repoPath) => {
+    try {
+      await setDefaultRepo(repoPath);
+      console.log(chalk.green(`✓ Default repo set to ${repoPath}`));
+    } catch (err) {
+      console.error(chalk.red(`✗ Error: ${err instanceof Error ? err.message : String(err)}`));
+      process.exit(1);
+    }
+  });
+
+program
+  .command('clear-default')
+  .description('Clear the default repository setting')
+  .action(async () => {
+    try {
+      await clearDefaultRepo();
+      console.log(chalk.green('✓ Default repo cleared'));
+    } catch (err) {
+      console.error(chalk.red(`✗ Error: ${err instanceof Error ? err.message : String(err)}`));
+      process.exit(1);
+    }
+  });
+
+program
   .command('ask <question>')
   .description('Ask a question about the indexed repo')
-  .requiredOption('--repo <path>', 'Path to the indexed repository')
+  .option('--repo <path>', 'Path to the indexed repository (uses default if not specified)')
   .option('--history <depth>', 'How many prior turns to include (default: 10)', '10')
   .action(async (question, options) => {
     try {
+      let repoPath = options.repo;
+
+      // Use default repo if not specified
+      if (!repoPath) {
+        repoPath = await getDefaultRepo();
+        if (!repoPath) {
+          throw new Error(
+            'No repo specified. Use --repo <path> or set default with "rag-qa set-default <path>"'
+          );
+        }
+        console.log(chalk.gray(`Using default repo: ${repoPath}\n`));
+      }
+
       const historyDepth = parseInt(options.history, 10);
       if (isNaN(historyDepth) || historyDepth < 0) {
         throw new Error('--history must be a non-negative number');
       }
       console.log(chalk.blue(`Q: ${question}\n`));
       console.log(chalk.dim('A: '));
-      await askQuestion(question, options.repo, historyDepth);
+      await askQuestion(question, repoPath, historyDepth);
       console.log('\n');
     } catch (err) {
       console.error(chalk.red(`\n✗ Error: ${err instanceof Error ? err.message : String(err)}`));
