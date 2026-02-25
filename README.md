@@ -2,6 +2,8 @@
 
 A local-first developer tool that answers natural language questions about any codebase with cited source references. Ask "what does the auth system do?" and get streamed answers with file:line citations.
 
+![alt text](image.png)
+
 **Built with:** Python (FastAPI + Chroma), Node.js (Hono), React + Vite, Vercel AI SDK
 
 ## Why This Matters
@@ -122,7 +124,6 @@ Supported LLM providers:
 
 ## Development
 
-
 ### Run tests
 
 ```bash
@@ -188,6 +189,7 @@ Query your codebase from the terminal without a browser. See [cli/README.md](./c
 **Installation:**
 
 For local development:
+
 ```bash
 cd cli
 npm install
@@ -196,6 +198,7 @@ npm run dev -- <command>  # e.g., npm run dev -- list
 ```
 
 Or install globally:
+
 ```bash
 cd cli
 npm install
@@ -204,16 +207,13 @@ npm install -g .  # Install from repo
 ```
 
 **Usage:**
+
 ```bash
-rag-qa list                                              # Show indexed repos
-rag-qa index /path/to/repo                              # Index a repo
-rag-qa ask "how does auth work?" --repo /path/to/repo   # Ask a question
-rag-qa history /path/to/repo                            # View conversation
-rag-qa export /path/to/repo --format markdown           # Export transcript
-rag-qa clear /path/to/repo                              # Clear history
+rag-qa list                                    # Show indexed repos
+rag-qa index /path/to/repo                    # Index a repo
+rag-qa set-default /path/to/repo              # Set default repo
+rag-qa ask "how does auth work?"              # Ask (uses default)
+rag-qa ask "where?" --repo /path/to/repo      # Ask (override default)
+rag-qa history /path/to/repo                  # View conversation
+rag-qa export /path/to/repo --format markdown # Export transcript
 ```
-
-## Future Work
-
-- [ ] **Batch indexing** — Index multiple repos in one operation. Workaround: use repo history to quickly switch between repos without re-indexing.
-- [ ] **Web deployment** — Host on Vercel + Supabase (pgvector). Requires: cloud vector DB, file upload/GitHub integration, user authentication, secure secrets management.
