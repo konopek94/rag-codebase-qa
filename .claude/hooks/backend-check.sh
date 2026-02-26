@@ -3,8 +3,7 @@
 # Vitest file (itself if it is a test, else a sibling <name>.test.ts) and the backend typecheck.
 # Exit 2 sends the failure output on stderr back to the agent; anything else exits 0 silently.
 #
-# The typecheck reports only errors in the edited file: master carries 2 known tsc errors in
-# src/routes/ingest.test.ts, and a full-project gate would block every edit until they are fixed.
+# The typecheck covers the whole project, so an edit that breaks another file is caught too.
 
 input=$(cat)
 if command -v jq >/dev/null 2>&1; then
@@ -46,10 +45,9 @@ if [[ -f "$test_file" ]]; then
   fi
 fi
 
-tsc_errors=$(./node_modules/.bin/tsc --noEmit --pretty false -p . 2>&1 | grep -F "$rel(")
-if [[ -n "$tsc_errors" ]]; then
+if ! tsc_errors=$(./node_modules/.bin/tsc --noEmit --pretty false -p . 2>&1); then
   failed=1
-  report+="tsc --noEmit errors in $rel:"$'\n'"$tsc_errors"$'\n'
+  report+="tsc --noEmit errors:"$'\n'"$tsc_errors"$'\n'
 fi
 
 if [[ $failed -eq 1 ]]; then

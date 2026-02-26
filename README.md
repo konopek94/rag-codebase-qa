@@ -153,7 +153,7 @@ curl -X POST http://localhost:8001/query \
 - Skills in `.claude/skills/`:
   - `add-ingest-filter` - add a skip/ignore/chunking rule with a fixture in `backend/test-fixtures/sample-repo` and a Vitest case.
   - `eval-answers` - ingest the sample repo, ask the questions in `scripts/eval-cases.json` and check the answers cite the expected files: `node scripts/eval-answers.mjs` (needs the Python service, the backend and an LLM key; `--check` only validates the case file).
-- Hook in `.claude/settings.json`: after an agent edits a `backend/src/**/*.ts` file, `.claude/hooks/backend-check.sh` runs that file's sibling `*.test.ts` and `tsc --noEmit` (errors in the edited file), and feeds any failure back to the agent.
+- Hook in `.claude/settings.json`: after an agent edits a `backend/src/**/*.ts` file, `.claude/hooks/backend-check.sh` runs that file's sibling `*.test.ts` and `tsc --noEmit` on the whole project, and feeds any failure back to the agent.
 
 ## Known Issues
 

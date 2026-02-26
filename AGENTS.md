@@ -82,12 +82,8 @@ The Python service has no tests.
 - Filesystem fixtures live in `backend/test-fixtures/sample-repo` only, resolved in tests as `path.resolve(__dirname, "../../test-fixtures/sample-repo")`. Its `node_modules/`, `app.log` and `secret.txt` are committed on purpose to exercise the skip list and `.gitignore` handling; files matching the root `.gitignore` need `git add -f`. Keep fixture files tiny and synthetic, never copied from a real project. Use `fs.mkdtempSync` (as in `historyStore.test.ts`) for anything a test writes.
 - `scripts/eval-cases.json` asserts on the fixture's content, so changing a fixture file means checking those cases too.
 
-## Known state
-
-- On `master`, `npx tsc --noEmit` reports 2 errors in `src/routes/ingest.test.ts` (TS2556 on the mock spreads) and `npm run lint` reports Prettier errors in `fileWalker.ts`, `ignoreMatcher.ts` and `ingest.test.ts`. `npm test` passes. Fix those in their own commit, not as a side effect of a feature.
-
 ## Agent tooling
 
 - `.claude/skills/add-ingest-filter/` - adding a skip/ignore/chunking rule with a fixture and a Vitest case.
 - `.claude/skills/eval-answers/` - end-to-end citation check against the sample repo (`node scripts/eval-answers.mjs`).
-- `.claude/hooks/backend-check.sh` (wired in `.claude/settings.json`) - after each edit to `backend/src/**/*.ts`, runs that file's sibling test and the typecheck (errors in the edited file only), and feeds failures back.
+- `.claude/hooks/backend-check.sh` (wired in `.claude/settings.json`) - after each edit to `backend/src/**/*.ts`, runs that file's sibling test and the whole-project typecheck, and feeds failures back.
