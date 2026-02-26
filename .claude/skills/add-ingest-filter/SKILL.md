@@ -72,7 +72,7 @@ Smallest change in the chosen layer. Backend style: double quotes, semicolons, `
 cd backend
 npx vitest run src/lib/fileWalker.test.ts   # the file you touched
 npm test                                     # ingest.test.ts walks the same fixture
-npx tsc --noEmit                             # 2 known errors in ingest.test.ts on master; add none
+npx tsc --noEmit                             # must report no errors
 ```
 
 If the rule is user-visible, update the "Smart skip list" bullet in `README.md`.
