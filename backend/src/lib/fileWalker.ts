@@ -2,7 +2,15 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Ignore } from "ignore";
 
-const EXCLUDE_DIRS = new Set(["node_modules", ".git", "dist", "build", ".next", "coverage", ".cache"]);
+const EXCLUDE_DIRS = new Set([
+  "node_modules",
+  ".git",
+  "dist",
+  "build",
+  ".next",
+  "coverage",
+  ".cache",
+]);
 const EXCLUDE_EXTENSIONS = new Set([
   ".png",
   ".jpg",

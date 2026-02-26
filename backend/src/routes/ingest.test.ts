@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const ingestChunksMock = vi.fn(async () => ({ indexed: 1 }));
-const dropCollectionMock = vi.fn(async () => undefined);
+const ingestChunksMock = vi.fn(async (..._args: unknown[]) => ({ indexed: 1 }));
+const dropCollectionMock = vi.fn(async (..._args: unknown[]) => undefined);
 const chunkFileMock = vi.fn();
 
 vi.mock("../lib/pyClient.js", () => ({
@@ -12,9 +12,7 @@ vi.mock("../lib/pyClient.js", () => ({
 }));
 
 vi.mock("../lib/chunker.js", async () => {
-  const actual = await vi.importActual<typeof import("../lib/chunker.js")>(
-    "../lib/chunker.js"
-  );
+  const actual = await vi.importActual<typeof import("../lib/chunker.js")>("../lib/chunker.js");
   return {
     ...actual,
     chunkFile: (...args: Parameters<typeof actual.chunkFile>) => chunkFileMock(...args),
@@ -38,9 +36,7 @@ describe("POST /ingest", () => {
     ingestChunksMock.mockClear();
     dropCollectionMock.mockClear();
     // Default: chunker passes through to the real implementation.
-    const actual = await vi.importActual<typeof import("../lib/chunker.js")>(
-      "../lib/chunker.js"
-    );
+    const actual = await vi.importActual<typeof import("../lib/chunker.js")>("../lib/chunker.js");
     chunkFileMock.mockReset();
     chunkFileMock.mockImplementation(actual.chunkFile);
   });

@@ -1,9 +1,6 @@
 import ignore, { type Ignore } from "ignore";
 
-export function buildIgnoreMatcher(
-  gitignoreContent: string,
-  userPatterns: string
-): Ignore {
+export function buildIgnoreMatcher(gitignoreContent: string, userPatterns: string): Ignore {
   const matcher = ignore();
   if (gitignoreContent.trim().length > 0) {
     matcher.add(gitignoreContent);
