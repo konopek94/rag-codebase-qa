@@ -1,0 +1,28 @@
+[
+  {
+    "id": "x-value",
+    "question": "What value is the constant x set to?",
+    "mustCite": ["src/index.ts"]
+  },
+  {
+    "id": "y-location",
+    "question": "Which file defines the constant y?",
+    "mustCite": ["src/util.ts"]
+  },
+  {
+    "id": "all-constants",
+    "question": "List every exported constant in this repo with its value.",
+    "mustCite": ["src/index.ts", "src/util.ts"]
+  },
+  {
+    "id": "ignore-rules",
+    "question": "Which files or patterns does this repo tell git to ignore?",
+    "mustCite": [".gitignore"],
+    "mustNotCite": ["secret.txt", "app.log"]
+  },
+  {
+    "id": "docs-heading",
+    "question": "What is the heading of the intro document in docs?",
+    "mustCite": ["docs/intro.md"]
+  }
+]
