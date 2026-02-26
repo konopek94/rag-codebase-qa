@@ -90,4 +90,4 @@ The Python service has no tests.
 
 - `.claude/skills/add-ingest-filter/` - adding a skip/ignore/chunking rule with a fixture and a Vitest case.
 - `.claude/skills/eval-answers/` - end-to-end citation check against the sample repo (`node scripts/eval-answers.mjs`).
-- `.claude/hooks/backend-check.sh` (wired in `.claude/settings.json`) - after each edit to `backend/src/**/*.ts`, runs that file's sibling test and the typecheck, and feeds failures back.
+- `.claude/hooks/backend-check.sh` (wired in `.claude/settings.json`) - after each edit to `backend/src/**/*.ts`, runs that file's sibling test and the typecheck (errors in the edited file only), and feeds failures back.
